@@ -6,6 +6,7 @@ const Product = require('../src/models/Product');
 
 let authToken;
 let testUser;
+let testUserId;
 
 beforeAll(async () => {
   await User.deleteMany({});
@@ -16,13 +17,15 @@ beforeAll(async () => {
     email: 'test@example.com',
     password: 'password123'
   });
+  
+  testUserId = testUser._id.toString();
 
   const loginRes = await request(app)
     .post('/api/auth/login')
     .send({ email: 'test@example.com', password: 'password123' });
   
   authToken = loginRes.body.token;
-});
+}, 30000);
 
 afterAll(async () => {
   if (server) {
@@ -172,12 +175,16 @@ describe('Product Controller (RPG)', () => {
 
   describe('GET /api/products with filters', () => {
     beforeAll(async () => {
+      if (!testUserId) {
+        const user = await User.findOne({ email: 'test@example.com' });
+        testUserId = user._id.toString();
+      }
       await Product.create([
-        { name: 'Escudo', price: 100, category: 'armadura', rarity: 'raro', user: testUser._id },
-        { name: 'Poción HP', price: 50, category: 'poción', rarity: 'común', user: testUser._id },
-        { name: 'Anillo Mágico', price: 1000, category: 'accesorio', rarity: 'legendario', user: testUser._id }
+        { name: 'Escudo', price: 100, category: 'armadura', rarity: 'raro', user: testUserId },
+        { name: 'Poción HP', price: 50, category: 'poción', rarity: 'común', user: testUserId },
+        { name: 'Anillo Mágico', price: 1000, category: 'accesorio', rarity: 'legendario', user: testUserId }
       ]);
-    });
+    }, 30000);
 
     it('should get all products', async () => {
       const res = await request(app)
@@ -212,6 +219,10 @@ describe('Product Controller (RPG)', () => {
     let product;
 
     beforeAll(async () => {
+      if (!testUserId) {
+        const user = await User.findOne({ email: 'test@example.com' });
+        testUserId = user._id.toString();
+      }
       product = await Product.create({
         name: 'Armadura de Acero',
         price: 500,
@@ -219,9 +230,9 @@ describe('Product Controller (RPG)', () => {
         rarity: 'raro',
         defense: 30,
         durability: 100,
-        user: testUser._id
+        user: testUserId
       });
-    });
+    }, 30000);
 
     it('should get a specific item with RPG stats', async () => {
       const res = await request(app)
@@ -249,15 +260,19 @@ describe('Product Controller (RPG)', () => {
     let product;
 
     beforeAll(async () => {
+      if (!testUserId) {
+        const user = await User.findOne({ email: 'test@example.com' });
+        testUserId = user._id.toString();
+      }
       product = await Product.create({
         name: 'Espada Básica',
         price: 50,
         category: 'arma',
         rarity: 'común',
         damage: 10,
-        user: testUser._id
+        user: testUserId
       });
-    });
+    }, 30000);
 
     it('should update item with new RPG attributes', async () => {
       const res = await request(app)
@@ -281,11 +296,15 @@ describe('Product Controller (RPG)', () => {
     let product;
 
     beforeEach(async () => {
+      if (!testUserId) {
+        const user = await User.findOne({ email: 'test@example.com' });
+        testUserId = user._id.toString();
+      }
       product = await Product.create({
         name: 'Item a Eliminar',
         price: 5,
         category: 'material',
-        user: testUser._id
+        user: testUserId
       });
     });
 
