@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../src/server');
+const { app, server } = require('../src/server');
 const User = require('../src/models/User');
 const Product = require('../src/models/Product');
 
@@ -25,6 +25,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  if (server) {
+    server.close();
+  }
   await mongoose.connection.close();
 });
 

@@ -4,19 +4,16 @@ const jwt = require('jsonwebtoken');
 jest.setTimeout(30000);
 
 beforeAll(async () => {
-  const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/productos_test';
-  await mongoose.connect(mongoURI);
+  if (mongoose.connection.readyState === 0) {
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/productos_test';
+    await mongoose.connect(mongoURI);
+  }
 });
 
 afterAll(async () => {
-  await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
-});
-
-afterEach(async () => {
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    await collections[key].deleteMany({});
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
   }
 });
 
