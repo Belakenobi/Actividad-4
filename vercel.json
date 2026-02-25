@@ -17,8 +17,7 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "@mongodb-uri",
-    "JWT_SECRET": "@jwt-secret",
+    "JWT_SECRET": "your-jwt-secret-key",
     "JWT_EXPIRE": "24h"
   }
 }
